@@ -54,7 +54,7 @@ class Minutiae (object):
 
     def update(self) -> None:
         name = self.master.enumerate.item_selected
-        # self.options.update()
+        self.options.update()
 
         if name is None or name == "$ /add":
             self.hide()
@@ -62,12 +62,14 @@ class Minutiae (object):
 
         self.show()
         self.terminal.clear()
-        self.common.clear()
+        self.common.config_clear()
 
         config = module.services.instance(name).load_config()
         proxys = config.get("proxies", [])
         if not isinstance(proxys, list): proxys = []
+        start = config.get("start", [])
+        if not isinstance(start, list): start = []
 
         self.terminal.update()
-        self.common.update(config)
-        self.proxies.update(proxys)
+        self.common.config_update(config)
+        self.proxies.config_update(proxys, start)

@@ -10,6 +10,7 @@ import ttkbootstrap
 from typex import once
 from ttkbootstrap import dialogs
 from ttkbootstrap.constants import *
+from ttkbootstrap.localization.msgcat import MessageCatalog
 
 # local
 import core
@@ -135,4 +136,6 @@ class Enumerate (object):
         self.treeview.insert("", "end", iid=f"$ /add", text="")
 
     def delete(self, item: str) -> None:
-        self.treeview.delete(item)
+        result = dialogs.Messagebox.okcancel(title="删除实例", message=f"确定删除实例 {item} 吗？\n这将删除实例的所有配置和数据")
+        if result != MessageCatalog.translate("OK"): return
+        # TODO

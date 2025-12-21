@@ -4,6 +4,7 @@
 # std
 import os
 import time
+import toml
 import tomllib
 import threading
 import subprocess
@@ -75,6 +76,9 @@ class Instance (object):
         self.thread_stdout.start()
         self.thread_stderr.start()
 
+    def reload(self) -> None:
+        subprocess.getoutput(f"{cwd.assets.frpc} reload -c {self.__config_file}")
+
     def stop(self) -> None:
         if not self.alive: return
 
@@ -123,8 +127,9 @@ class Instance (object):
         except Exception:
             return {}
 
-    def save_config(self, config: dict) -> None:
-        ... # TODO
+    def save_config(self, config: dict, update: bool = True) -> None:
+        with open(self.__config_file, "w", encoding="utf-8") as f:
+            toml.dump(config, f)
 
 
 def initialize_first() -> None:

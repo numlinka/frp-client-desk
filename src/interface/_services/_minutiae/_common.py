@@ -3,7 +3,7 @@
 
 # std
 import webbrowser
-from typing import Any
+from typing import Optional
 
 # site
 import ttkbootstrap
@@ -38,7 +38,7 @@ CONFIG_LIST = [
     ConfigOption("webServer.assetsDir", str),
     ConfigOption("webServer.pprofEnable", bool),
     # ConfigOption("webServer.tls", ...),
-    ConfigOption("udpPacketSize", int),
+    # ConfigOption("udpPacketSize", int),
     # ConfigOption("metadatas", dict[str, str]),
     # ConfigOption("includes", list[str]),
 ]
@@ -52,6 +52,10 @@ class Common (object):
         self.scrollframe = ScrollFrame(self.frame)
         self.build()
 
+    @property
+    def validity(self) -> bool:
+        return all(unit.validity for unit in self.options.values())
+
     @once
     def build(self) -> None:
         self.scrollframe.pack(side=TOP, fill=BOTH, expand=True, padx=2, pady=2)
@@ -60,25 +64,33 @@ class Common (object):
         for i, info in enumerate(CONFIG_LIST):
             self.options[info.name] = ConfigUnit(self.scrollframe, i, info)
 
-    def clear(self) -> None:
-        for _, value in self.options.items():
-            value.clear()
+    def config_clear(self) -> None:
+        for _, unit in self.options.items():
+            unit.clear()
 
-    def update(self, config: dict) -> None:
-        # name = self.master.master.enumerate.item_selected
-        # if name is None or name == "$ /add": return
-
-        # config = module.services.instance(name).load_config()
-
-        for name, value in self.options.items():
+    def config_update(self, config: dict) -> None:
+        for name, unit in self.options.items():
             if "." in name:
                 k1, k2 = name.split(".")
                 if k1 not in config: continue
                 if k2 not in config[k1]: continue
-                value.variable.set(config[k1][k2])
+                unit.variable.set(config[k1][k2])
 
             elif name in config:
-                value.variable.set(config[name])
+                unit.variable.set(config[name])
+
+    def config_get(self) -> dict:
+        config = {}
+        for name, unit in self.options.items():
+            if "." in name:
+                k1, k2 = name.split(".")
+                if k1 not in config: config[k1] = {}
+                config[k1][k2] = unit.get()
+
+            else:
+                config[name] = unit.get()
+
+        return config
 
 
 class ConfigUnit (object):
@@ -86,6 +98,7 @@ class ConfigUnit (object):
         self.master = master
         self.serial = serial
         self.info = info
+        self.validity = True
         self.build()
 
     def build(self) -> None:
@@ -97,14 +110,12 @@ class ConfigUnit (object):
         match self.info.name:
             case "auth.method":
                 self.entry = ttkbootstrap.Combobox(self.master, values=["", "token", "oidc"], width=width, textvariable=self.variable, state=READONLY)
-                # self.variable.set("token")
 
             case "serverPort" | "webServer.port":
                 self.entry = ttkbootstrap.Spinbox(self.master, from_=0, to=65535, width=width, textvariable=self.variable)
 
             case "udpPacketSize":
                 self.entry = ttkbootstrap.Spinbox(self.master, from_=0, to=65535, width=width, textvariable=self.variable)
-                # self.variable.set(1500)
 
             case _:
                 if self.info.type_ == bool:
@@ -123,8 +134,47 @@ class ConfigUnit (object):
             self.button.grid(row=self.serial, column=2, sticky=E, padx=2, pady=2)
             interface.annotation.register(self.button, i18n.ctrl.translation(f"在浏览器中打开"))
 
+        self.variable.trace_add("write", self.bin_change)
+
+    def bin_change(self, *_) -> None:
+        value = self.variable.get()
+        validity = False
+
+        match self.info.name:
+            case "auth.method":
+                validity = value in ["", "token", "oidc"]
+
+            case "serverPort" | "webServer.port":
+                if value:
+                    try:
+                        value = int(value)
+                        if 0 <= value <= 65535:
+                            validity = True
+
+                    except Exception:
+                        pass
+
+                else:
+                    validity = True
+
+            case _:
+                validity = True
+
+        self.validity = validity
+        self.entry.configure(bootstyle=(DEFAULT if validity else DANGER))
+
     def clear(self) -> None:
         self.variable.set("")
+
+    def set(self, value) -> None:
+        self.variable.set(value)
+
+    def get(self) -> Optional[str | int | bool]:
+        value = self.variable.get()
+        if not value: return None
+        if self.info.type_ == bool:
+            return bool(int(value))
+        return self.info.type_(value)
 
     def open_browser(self) -> None:
         port = self.variable.get()

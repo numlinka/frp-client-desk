@@ -8,6 +8,7 @@ import tkinter
 import ttkbootstrap
 
 from typex import once
+from ttkbootstrap import dialogs
 from ttkbootstrap.constants import *
 
 # local
@@ -25,20 +26,53 @@ class Options (object):
     @once
     def build(self) -> None:
         self.button_switch = ttkbootstrap.Button(self.frame, text="■ 停止", bootstyle=(DANGER, OUTLINE), command=self.bin_switch, width=12)
-        self.button_reload = ttkbootstrap.Button(self.frame, text="reload", bootstyle=(WARNING, OUTLINE), command=self.bin_reload, width=12)
-        self.button_refresh = ttkbootstrap.Button(self.frame, text="refresh", bootstyle=(INFO, OUTLINE), command=self.bin_refresh, width=12)
+        self.button_reload = ttkbootstrap.Button(self.frame, text="reload", bootstyle=(PRIMARY, OUTLINE), command=self.bin_reload, width=12)
+        self.button_save = ttkbootstrap.Button(self.frame, text="save", bootstyle=(INFO, OUTLINE), command=self.bin_save, width=12)
         self.button_switch.pack(side=RIGHT)
         self.button_reload.pack(side=RIGHT, padx=(0, 4))
-        self.button_refresh.pack(side=RIGHT, padx=(0, 4))
+        self.button_save.pack(side=RIGHT, padx=(0, 4))
+
+    def sbin_disabled(self) -> None:
+        self.button_switch.configure(state=DISABLED)
+        self.button_reload.configure(state=DISABLED)
+        self.button_save.configure(state=DISABLED)
+        interface.mainwindow.update()
+
+    def sbin_enabled(self) -> None:
+        self.button_switch.configure(state=NORMAL)
+        self.button_reload.configure(state=NORMAL)
+        self.button_save.configure(state=NORMAL)
 
     def bin_switch(self) -> None:
+        self.sbin_disabled()
         interface.services.minutiae.terminal.clear()
+        interface.mainwindow.after(500, self.sbin_enabled)
 
     def bin_reload(self) -> None:
-        interface.services.minutiae.terminal.println("reload")
+        self.sbin_disabled()
+        name = self.master.master.enumerate.item_selected
+        if name is None or name == f"$ /add": return
+        module.services.instance(name).reload()
+        interface.mainwindow.after(500, self.sbin_enabled)
 
-    def bin_refresh(self) -> None:
-        interface.services.minutiae.terminal.print("refresh ")
+    def bin_save(self) -> None:
+        self.sbin_disabled()
+        if not self.master.common.validity:
+            dialogs.Messagebox.show_warning(title="参数错误", message="通用配置存在参数错误\n请检查被颜色标记的参数")
+            return
+
+        if not self.master.proxies.validity:
+            dialogs.Messagebox.show_warning(title="参数错误", message="隧道列表存在参数错误\n请检查被颜色标记的参数")
+            return
+
+        name = self.master.master.enumerate.item_selected
+        if name is None or name == f"$ /add": return
+        config = self.master.common.config_get()
+        proxies, start = self.master.proxies.config_get()
+        config["start"] = start
+        config["proxies"] = proxies
+        module.services.instance(name).save_config(config)
+        interface.mainwindow.after(500, self.sbin_enabled)
 
     def update(self) -> None:
         name = self.master.master.enumerate.item_selected

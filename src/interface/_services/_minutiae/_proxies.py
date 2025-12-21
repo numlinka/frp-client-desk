@@ -26,6 +26,10 @@ class Proxies (object):
         self.scrollframe = ScrollFrame(self.frame)
         self.build()
 
+    @property
+    def validity(self) -> bool:
+        return all(unit.validity for unit in self.list)
+
     @once
     def build(self) -> None:
         self.scrollframe.pack(side=TOP, fill=BOTH, expand=True, padx=2, pady=2)
@@ -67,14 +71,14 @@ class Proxies (object):
         self.list.remove(unit)
         unit.forget()
 
-    def clear(self) -> None:
+    def config_clear(self) -> None:
         self.atomic = Atomic()
         self.atomic.get_count()
         for unit in self.list:
             unit.forget()
         self.list.clear()
 
-    def update(self, proxys: list[dict]) -> None:
+    def config_update(self, proxys: list[dict], start: list[str]) -> None:
         for unit in self.list:
             unit.forget()
         self.list.clear()
@@ -84,10 +88,31 @@ class Proxies (object):
             self.list.append(unit)
             if "name" in proxy: unit.v_name.set(proxy["name"])
             if "type" in proxy: unit.v_type.set(proxy["type"])
-            if "local_ip" in proxy: unit.v_local_ip.set(proxy["local_ip"])
-            if "local_port" in proxy: unit.v_local_port.set(proxy["local_port"])
-            if "remote_port" in proxy: unit.v_remote_port.set(proxy["remote_port"])
-            if "enable" in proxy: unit.v_enable.set(proxy["enable"])
+            if "localIP" in proxy: unit.v_local_ip.set(proxy["localIP"])
+            if "localPort" in proxy: unit.v_local_port.set(proxy["localPort"])
+            if "remotePort" in proxy: unit.v_remote_port.set(proxy["remotePort"])
+            if not start or ("name" in proxy and proxy["name"] in start):
+                unit.v_enable.set(True)
+            else:
+                unit.v_enable.set(False)
+
+    def config_get(self) -> tuple[list[dict], list[str]]:
+        proxys = []
+        start = []
+
+        for unit in self.list:
+            proxys.append({
+                "name": unit.v_name.get(),
+                "type": unit.v_type.get(),
+                "localIP": unit.v_local_ip.get(),
+                "localPort": unit.v_local_port.get(),
+                "remotePort": unit.v_remote_port.get(),
+            })
+
+            if unit.v_enable.get():
+                start.append(unit.v_name.get())
+
+        return proxys, start
 
 
 class ConfigUnit (object):
