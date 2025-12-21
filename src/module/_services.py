@@ -85,8 +85,10 @@ class Instance (object):
         with self.lock:
             self.process = subprocess.Popen(
                 [cwd.assets.frpc, "-c", self._config_file],
+                stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
+                creationflags=subprocess.CREATE_NO_WINDOW
             )
 
         core.event.emit(INSTANCE_SWITCHED)
