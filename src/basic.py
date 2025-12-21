@@ -33,6 +33,9 @@ class _LocalI18n (Internationalization):
         option_value_err: I18nString
         option_common_err: I18nString
         option_proxie_err: I18nString
+        option_switch_help: I18nString
+        option_reload_help: I18nString
+        option_save_help: I18nString
         proxies: I18nString
         proxies_name: I18nString
         proxies_type: I18nString

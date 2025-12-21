@@ -37,6 +37,10 @@ class Options (object):
         self.button_save.pack(side=RIGHT, pady=4, padx=(4, 0))
         core.event.subscribe(INSTANCE_SWITCHED, self.update)
 
+        interface.annotation.register(self.button_switch, i18n.UI.option_switch_help)
+        interface.annotation.register(self.button_reload, i18n.UI.option_reload_help)
+        interface.annotation.register(self.button_save, i18n.UI.option_save_help)
+
     def sbin_disabled(self) -> None:
         self.button_switch.configure(state=DISABLED)
         self.button_reload.configure(state=DISABLED)

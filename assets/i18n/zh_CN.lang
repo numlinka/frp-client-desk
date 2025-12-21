@@ -4,6 +4,7 @@
 
 
 language = 简体中文（中国）
+slogan = Ciallo～ (∠・ω< )⌒★
 
 
 #define superiors UI
@@ -19,6 +20,9 @@ option_save = 保存
 option_value_err = 参数错误
 option_common_err = 通用配置存在参数错误\n请检查被颜色标记的参数
 option_proxie_err = 隧道列表存在参数错误\n请检查被颜色标记的参数
+option_switch_help = 启动或停止实例\n该选项不会保存配置文件
+option_reload_help = 在不重启实例的情况下热加载修改后的配置\n若未启用 webServer 或中途修改过 webServer.port 参数则无法生效\n该选项不会保存配置文件
+option_save_help = 保存配置文件
 proxies = 隧道列表
 proxies_name = 名称
 proxies_type = 隧道类型
