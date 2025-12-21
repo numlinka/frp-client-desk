@@ -15,7 +15,7 @@ from ttkbootstrap.localization.msgcat import MessageCatalog
 # local
 import core
 import module
-import constants
+from constants.event import INSTANCE_SWITCHED
 import interface
 from basic import i18n
 
@@ -51,6 +51,7 @@ class Enumerate (object):
 
         self.item_hover = None
         self.item_selected = None
+        core.event.subscribe(INSTANCE_SWITCHED, self.update)
 
     def bin_motion(self, event: tkinter.Event) -> None:
         item = self.treeview.identify_row(event.y)
@@ -118,7 +119,18 @@ class Enumerate (object):
         self.treeview.delete("$ /add")
         self.treeview.insert("", "end", iid=name, text=name)
         self.item_hover = None
+        module.services.create(name)
         self.treeview.insert("", "end", iid=f"$ /add", text="")
+
+    def delete(self, item: str) -> None:
+        if module.services.instance(item).alive:
+            dialogs.Messagebox.show_error(title="删除实例失败", message="不可删除正在运行实例\n请先停止该实例")
+            return
+
+        result = dialogs.Messagebox.okcancel(title="删除实例", message=f"确定删除实例 {item} 吗？\n这将删除实例的所有配置和数据")
+        if result != MessageCatalog.translate("OK"): return
+        module.services.delete(item)
+        self.treeview.delete(item)
 
     def update(self) -> None:
         names = module.services.instances_names()
@@ -129,13 +141,10 @@ class Enumerate (object):
                 self.treeview.insert("", "end", iid=name, text=name)
             if instance.alive:
                 interface.methods.treeview_tag_add(self.treeview, name, "running")
+                interface.methods.treeview_value_set(self.treeview, name, 0, "▶")
             else:
                 interface.methods.treeview_tag_remove(self.treeview, name, "running")
+                interface.methods.treeview_value_set(self.treeview, name, 0, "")
 
         self.treeview.delete("$ /add")
         self.treeview.insert("", "end", iid=f"$ /add", text="")
-
-    def delete(self, item: str) -> None:
-        result = dialogs.Messagebox.okcancel(title="删除实例", message=f"确定删除实例 {item} 吗？\n这将删除实例的所有配置和数据")
-        if result != MessageCatalog.translate("OK"): return
-        # TODO

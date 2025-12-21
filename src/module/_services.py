@@ -11,8 +11,11 @@ import subprocess
 from typing import NoReturn
 
 # local
+import core
 import module
+
 from basic import cwd
+from constants.event import INSTANCE_SWITCHED, INSTANCE_LOG_UPDATED
 
 
 class Services (object):
@@ -39,21 +42,35 @@ class Services (object):
                 if name not in self._instances:
                     self._instances[name] = Instance(name)
 
+    def create(self, name: str) -> None:
+        with self._lock:
+            if name in self._instances: return
+            self._instances[name] = Instance(name)
+
+    def delete(self, name: str) -> None:
+        with self._lock:
+            if name not in self._instances: return
+            instance = self.instance(name)
+            if instance.alive: return
+            os.remove(instance._config_file)
+            del self._instances[name]
+
 
 class Instance (object):
     def __init__(self, name: str) -> None:
         self.lock = threading.RLock()
-        self.__name = name
-        self.__config_file = os.path.join(cwd.instances, f"{name}.toml")
+        self._name = name
+        self._config_file = os.path.join(cwd.instances, f"{name}.toml")
         self.process: subprocess.Popen | None = None
         self.thread_stdout: threading.Thread | None = None
         self.thread_stderr: threading.Thread | None = None
-        self.logs: list[str] = []
+        self._logs: list[str] = []
+        self._log_index = 0
         self.load_config()
 
     @property
     def name(self) -> str:
-        return self.__name
+        return self._name
 
     @property
     def alive(self) -> bool:
@@ -64,20 +81,20 @@ class Instance (object):
         if self.alive: return
 
         with self.lock:
-            if self.process is not None: return
             self.process = subprocess.Popen(
-                [cwd.assets.frpc, "-c", self.__config_file],
+                [cwd.assets.frpc, "-c", self._config_file],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
             )
 
-        self.thread_stdout = threading.Thread(target=self._log_stdout, name=f"Instance[{self.__name}].stdout", daemon=True)
-        self.thread_stderr = threading.Thread(target=self._log_stderr, name=f"Instance[{self.__name}].stderr", daemon=True)
+        core.event.emit(INSTANCE_SWITCHED)
+        self.thread_stdout = threading.Thread(target=self._log_stdout, name=f"Instance[{self._name}].stdout", daemon=True)
+        self.thread_stderr = threading.Thread(target=self._log_stderr, name=f"Instance[{self._name}].stderr", daemon=True)
         self.thread_stdout.start()
         self.thread_stderr.start()
 
     def reload(self) -> None:
-        subprocess.getoutput(f"{cwd.assets.frpc} reload -c {self.__config_file}")
+        subprocess.getoutput(f"{cwd.assets.frpc} reload -c {self._config_file}")
 
     def stop(self) -> None:
         if not self.alive: return
@@ -85,17 +102,29 @@ class Instance (object):
         with self.lock:
             if self.process is None: return
             self.process.terminate()
+            self.process = None
 
-    def add_log(self, content: str) -> None:
+    def log_add(self, content: str) -> None:
         while True:
             s = content.find("\033")
             if s == -1: break
-            m = content[s:].find("[0m")
+            m = content[s:].find("m", s)
             if m == -1: break
-            content = content[:s] + content[s+m+2:]
+            content = content[:s] + content[m+1:]
 
         with self.lock:
-            self.logs.append(content)
+            self._logs.append(content)
+            core.event.emit(INSTANCE_LOG_UPDATED)
+
+    def log_pop(self) -> list[str]:
+        with self.lock:
+            logs = self._logs[self._log_index:]
+            self._log_index = len(self._logs)
+            return logs
+
+    def log_index_clear(self) -> None:
+        with self.lock:
+            self._log_index = 0
 
     def _log_stdout(self) -> NoReturn:
         time.sleep(0.1)
@@ -104,8 +133,9 @@ class Instance (object):
 
         while self.alive:
             line = self.process.stdout.readline().decode("utf-8").strip()
-            if line: self.add_log(line)
+            if line: self.log_add(line)
 
+        core.event.emit(INSTANCE_SWITCHED)
         raise SystemExit(0)
 
     def _log_stderr(self) -> NoReturn:
@@ -115,20 +145,20 @@ class Instance (object):
 
         while self.alive:
             line = self.process.stderr.readline().decode("utf-8").strip()
-            if line: self.add_log(line)
+            if line: self.log_add(line)
 
         raise SystemExit(0)
 
     def load_config(self) -> dict:
         try:
-            with open(self.__config_file, "rb") as f:
+            with open(self._config_file, "rb") as f:
                 return tomllib.load(f)
 
         except Exception:
             return {}
 
     def save_config(self, config: dict, update: bool = True) -> None:
-        with open(self.__config_file, "w", encoding="utf-8") as f:
+        with open(self._config_file, "w", encoding="utf-8") as f:
             toml.dump(config, f)
 
 

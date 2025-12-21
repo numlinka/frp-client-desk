@@ -9,15 +9,16 @@ from ezudesign.utils import try_exec, exec_item
 from ttkbootstrap.constants import *
 
 # local
+import env
 import core
 import utils
 import constants
 
 # internal
-from . import methods
+from . import _slogan
 from . import _services
+from . import methods
 from . import annotation_toplevel
-
 
 _activitys = [_services]
 
@@ -26,6 +27,7 @@ style: ttkbootstrap.Style
 
 annotation: annotation_toplevel.AnnotationToplevel
 services: _services.Services
+slogan: _slogan.Slogan
 
 
 @once
@@ -34,7 +36,7 @@ def initialize_first() -> None:
     mainwindow = ttkbootstrap.Window()
     style = ttkbootstrap.Style()
 
-    mainwindow.title("frp-client-desk")
+    mainwindow.title(f"{env.name} v{env.version} -by {env.author}")
     # mainwindow.geometry("700x450")
     mainwindow.geometry("950x600")
 
@@ -44,8 +46,9 @@ def initialize_first() -> None:
 
 @once
 def initialize_setup() -> None:
-    global services
+    global services, slogan
     services = _services.Services()
+    slogan = _slogan.Slogan()
     utils.exec_initialize_activitys(_activitys, 1)
 
 

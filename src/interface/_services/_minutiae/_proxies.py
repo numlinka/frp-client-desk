@@ -83,6 +83,9 @@ class Proxies (object):
             unit.forget()
         self.list.clear()
 
+        if not proxys:
+            self.list.append(ConfigUnit(self, self.atomic.count))
+
         for proxy in proxys:
             unit = ConfigUnit(self, self.atomic.count)
             self.list.append(unit)
@@ -105,8 +108,8 @@ class Proxies (object):
                 "name": unit.v_name.get(),
                 "type": unit.v_type.get(),
                 "localIP": unit.v_local_ip.get(),
-                "localPort": unit.v_local_port.get(),
-                "remotePort": unit.v_remote_port.get(),
+                "localPort": int(unit.v_local_port.get()),
+                "remotePort": int(unit.v_remote_port.get()),
             })
 
             if unit.v_enable.get():

@@ -11,9 +11,12 @@ from typex import once
 from ttkbootstrap.constants import *
 
 # local
+import core
 import module
 import interface
+
 from basic import i18n
+from constants.event import INSTANCE_LOG_UPDATED
 
 
 class Terminal (object):
@@ -30,6 +33,7 @@ class Terminal (object):
         self.textbox.configure(yscrollcommand=self.scrollbar.set)
         self.textbox.pack(side=LEFT, fill=BOTH, expand=True, padx=(2, 1), pady=2)
         self.scrollbar.pack(side=RIGHT, fill=Y, padx=(0, 2), pady=2)
+        core.event.subscribe(INSTANCE_LOG_UPDATED, self.update_log)
 
     def clear(self) -> None:
         with self:
@@ -59,5 +63,12 @@ class Terminal (object):
         if name is None or name == "$ /add": return
 
         self.clear()
-        for log in module.services.instance(name).logs:
+        module.services.instance(name).log_index_clear()
+        self.update_log()
+
+    def update_log(self) -> None:
+        name = self.master.master.enumerate.item_selected
+        if name is None or name == "$ /add": return
+        lst = module.services.instance(name).log_pop()
+        for log in lst:
             self.println(log)

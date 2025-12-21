@@ -3,6 +3,7 @@
 
 MAINLOOP = "mainloop"
 INSTANCE_SELECTED = "instance_selected"
-
+INSTANCE_SWITCHED = "instance_switched"
+INSTANCE_LOG_UPDATED = "instance_log_updated"
 
 __all_events__ = [v for x, v in globals().items() if not x.startswith("_")]
