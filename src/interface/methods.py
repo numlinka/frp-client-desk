@@ -8,6 +8,7 @@ import tkinter
 
 # site
 import ttkbootstrap
+from PIL import Image, ImageTk
 
 
 def treeview_tag_add(treeview: ttkbootstrap.Treeview, item: str, tag: str) -> bool:
@@ -35,3 +36,13 @@ def treeview_value_set(treeview: ttkbootstrap.Treeview, item: str, index: int, v
 
 def fake_withdraw(window: tkinter.Wm):
     window.geometry("+32000+32000")
+
+def set_iconphoto(window: tkinter.Wm, file: str) -> None:
+    try:
+        icon_image = Image.open(file)
+        icon = ImageTk.PhotoImage(icon_image)
+        window.iconphoto(False, icon)
+        window.iconphoto(True, icon)
+
+    except tkinter.TclError:
+        ...

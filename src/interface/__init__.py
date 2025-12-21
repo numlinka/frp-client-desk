@@ -14,6 +14,7 @@ import env
 import core
 import utils
 import constants
+from basic import cwd
 
 # internal
 from . import _slogan
@@ -38,6 +39,7 @@ def initialize_first() -> None:
     style = ttkbootstrap.Style()
 
     mainwindow.title(f"{env.name} v{env.version} -by {env.author}")
+    methods.set_iconphoto(mainwindow, cwd.assets.favicon)
     mainwindow.geometry("950x600")
 
     annotation = annotation_toplevel.AnnotationToplevel()
