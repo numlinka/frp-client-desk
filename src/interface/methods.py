@@ -44,5 +44,5 @@ def set_iconphoto(window: tkinter.Wm, file: str) -> None:
         window.iconphoto(False, icon)
         window.iconphoto(True, icon)
 
-    except tkinter.TclError:
+    except Exception:
         ...
