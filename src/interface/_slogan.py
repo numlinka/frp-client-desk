@@ -30,8 +30,13 @@ class Slogan (object):
         self.license.pack(side=RIGHT)
         self.slogan.pack(side=LEFT)
 
-        self.slogan.bind("<Button-1>", self.bin_open_url)
+        self.slogan.bind("<Button-1>", self.bin_open_url_slogan)
+        self.license.bind("<Button-1>", self.bin_open_url_license)
 
-    def bin_open_url(self, *_):
+    def bin_open_url_slogan(self, *_):
+        import webbrowser
+        webbrowser.open("https://afdian.com/a/numlinka")
+
+    def bin_open_url_license(self, *_):
         import webbrowser
         webbrowser.open(env.url)
