@@ -1,6 +1,8 @@
 # Licensed under the GNU General Public License v3.0, see <http://www.gnu.org/licenses/gpl-3.0.html>.
 # frp-client-desk Copyright (c) 2025 numlinka.
 
+__all__ = ["AnnotationToplevel"]
+
 # std
 import ctypes
 import tkinter
@@ -18,7 +20,7 @@ class AnnotationToplevel (object):
         self.toplevel.overrideredirect(True)
         self.frame = ttkbootstrap.Frame(self.toplevel, borderwidth=2, relief="solid")
         self.frame.pack()
-        self.label = ttkbootstrap.Label(self.frame, text="这是一个测试描述\n当然他是可以修改的", )
+        self.label = ttkbootstrap.Label(self.frame, text="^_^", )
         self.label.pack(padx=4, pady=4)
         self.withdraw()
         self._sw = self.toplevel.winfo_screenwidth()

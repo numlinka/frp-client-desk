@@ -1,8 +1,7 @@
 # Licensed under the GNU General Public License v3.0, see <http://www.gnu.org/licenses/gpl-3.0.html>.
 # frp-client-desk Copyright (c) 2025 numlinka.
 
-# std
-import tkinter
+__all__ = ["Terminal"]
 
 # site
 import ttkbootstrap
@@ -23,7 +22,7 @@ class Terminal (object):
     def __init__(self, master: "interface._services._minutiae.Minutiae") -> None:
         self.master = master
         self.frame = ttkbootstrap.Frame(self.master.notebook)
-        self.master.notebook.add(self.frame, text=i18n.ctrl.translation("终端"))
+        self.master.notebook.add(self.frame, text=i18n.UI.terminal)
         self.build()
 
     @once

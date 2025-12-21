@@ -1,11 +1,12 @@
 # Licensed under the GNU General Public License v3.0, see <http://www.gnu.org/licenses/gpl-3.0.html>.
 # frp-client-desk Copyright (c) 2025 numlinka.
 
+__all__ = ["methods", "mainwindow", "style", "annotation", "services", "slogan"]
+
 # site
 import ttkbootstrap
 
 from typex import once
-from ezudesign.utils import try_exec, exec_item
 from ttkbootstrap.constants import *
 
 # local
@@ -37,7 +38,6 @@ def initialize_first() -> None:
     style = ttkbootstrap.Style()
 
     mainwindow.title(f"{env.name} v{env.version} -by {env.author}")
-    # mainwindow.geometry("700x450")
     mainwindow.geometry("950x600")
 
     annotation = annotation_toplevel.AnnotationToplevel()

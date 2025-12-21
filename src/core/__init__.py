@@ -1,13 +1,11 @@
 # Licensed under the GNU General Public License v3.0, see <http://www.gnu.org/licenses/gpl-3.0.html>.
 # frp-client-desk Copyright (c) 2025 numlinka.
 
-# std
-import sys
+__all__ = ["event"]
 
 # site
 import ezudesign
 from typex import once
-from ezudesign.utils import try_exec, exec_item
 
 # local
 import utils
@@ -53,4 +51,3 @@ def initialize() -> None:
 def run() -> None:
     initialize()
     interface.mainwindow.mainloop()
-    

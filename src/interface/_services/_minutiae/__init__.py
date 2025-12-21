@@ -1,8 +1,7 @@
 # Licensed under the GNU General Public License v3.0, see <http://www.gnu.org/licenses/gpl-3.0.html>.
 # frp-client-desk Copyright (c) 2025 numlinka.
 
-# std
-import tkinter
+__all__ = ["Minutiae"]
 
 # site
 import ttkbootstrap
@@ -36,7 +35,7 @@ class Minutiae (object):
     def build(self) -> None:
         self.frame_options.pack(side=BOTTOM, fill=X)
         self.notebook.pack(side=TOP, fill=BOTH, expand=True, pady=(0, 5))
-        self.label_null = ttkbootstrap.Label(self.frame_null, text="minutiae.null", anchor=CENTER)
+        self.label_null = ttkbootstrap.Label(self.frame_null, text=i18n.UI.minutiae_null, anchor=CENTER)
         self.label_null.pack(side=TOP, fill=BOTH, expand=True)
         self.options = _options.Options(self)
         self.terminal = _terminal.Terminal(self)

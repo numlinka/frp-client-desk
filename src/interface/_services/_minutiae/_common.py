@@ -1,6 +1,8 @@
 # Licensed under the GNU General Public License v3.0, see <http://www.gnu.org/licenses/gpl-3.0.html>.
 # frp-client-desk Copyright (c) 2025 numlinka.
 
+__all__ = ["Common"]
+
 # std
 import webbrowser
 from typing import Optional
@@ -12,7 +14,6 @@ from typex import once
 from ttkbootstrap.constants import *
 
 # local
-import module
 import interface
 
 from basic import i18n
@@ -48,7 +49,7 @@ class Common (object):
     def __init__(self, master: "interface._services._minutiae.Minutiae") -> None:
         self.master = master
         self.frame = ttkbootstrap.Frame(self.master.notebook)
-        self.master.notebook.add(self.frame, text=i18n.ctrl.translation("通用配置"))
+        self.master.notebook.add(self.frame, text=i18n.ctrl.translation(i18n.UI.common))
         self.scrollframe = ScrollFrame(self.frame)
         self.build()
 
@@ -130,9 +131,9 @@ class ConfigUnit (object):
         interface.annotation.register(self.entry, i18n.ctrl.translation(f"description.frp.{self.info.name}"))
 
         if self.info.name == "webServer.port":
-            self.button = ttkbootstrap.Button(self.master, text="➤", bootstyle=(OUTLINE, INFO), command=self.open_browser)
+            self.button = ttkbootstrap.Button(self.master, text=i18n.UI.link, bootstyle=(OUTLINE, INFO), command=self.open_browser)
             self.button.grid(row=self.serial, column=2, sticky=E, padx=2, pady=2)
-            interface.annotation.register(self.button, i18n.ctrl.translation(f"在浏览器中打开"))
+            interface.annotation.register(self.button, i18n.ctrl.translation(i18n.UI.open_in_browser))
 
         self.variable.trace_add("write", self.bin_change)
 

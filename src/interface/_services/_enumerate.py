@@ -1,6 +1,8 @@
 # Licensed under the GNU General Public License v3.0, see <http://www.gnu.org/licenses/gpl-3.0.html>.
 # frp-client-desk Copyright (c) 2025 numlinka.
 
+__all__ = ["Enumerate"]
+
 # std
 import tkinter
 
@@ -64,7 +66,7 @@ class Enumerate (object):
 
             if item:
                 interface.methods.treeview_tag_add(self.treeview, item, "hover")
-                interface.methods.treeview_value_set(self.treeview, item, 1, "✖" if item != "$ /add" else "✚")
+                interface.methods.treeview_value_set(self.treeview, item, 1, i18n.UI.enum_c_delete if item != "$ /add" else i18n.UI.enum_c_create)
 
         if item and self.treeview.identify_column(event.x) == "#2":
             self.treeview.configure(cursor="hand2")
@@ -100,20 +102,23 @@ class Enumerate (object):
         selected = selection[0]
         if self.item_selected == selected: return
         self.item_selected = selected
-        # core.event.emit(constants.event.INSTANCE_SELECTED)
         self.master.minutiae.update()
 
     def create(self) -> None:
-        name = dialogs.Querybox.get_string(title="新建实例", prompt="输入新的实例名称\n名称不能为空、不能重复、不能包含特殊字符")
+        name = dialogs.Querybox.get_string(title=i18n.UI.enum_new_ins, prompt=i18n.UI.enum_new_ins_t)
         if name is None: return
         name = name.strip()
         if not name:
-            dialogs.Messagebox.show_error(title="创建实例失败", message="非法的实例名称\n实例名称不能为空")
+            dialogs.Messagebox.show_error(title=i18n.UI.enum_new_ins_err, message=i18n.UI.enum_new_ins_err_t_null)
+            return
+
+        if name in module.services.instances_names():
+            dialogs.Messagebox.show_error(title=i18n.UI.enum_new_ins_err, message=i18n.UI.enum_new_ins_err_t_exist)
             return
 
         for char in ["\\", "/", ":", "*", "?", "\"", "<", ">", "|"]:
             if char in name:
-                dialogs.Messagebox.show_error(title="创建实例失败", message=f"非法的实例名称\n实例名称不能包含特殊字符：{char}")
+                dialogs.Messagebox.show_error(title=i18n.UI.enum_new_ins_err, message=i18n.UI.enum_new_ins_err_t_valid.format(char=char))
                 return
 
         self.treeview.delete("$ /add")
@@ -124,10 +129,10 @@ class Enumerate (object):
 
     def delete(self, item: str) -> None:
         if module.services.instance(item).alive:
-            dialogs.Messagebox.show_error(title="删除实例失败", message="不可删除正在运行实例\n请先停止该实例")
+            dialogs.Messagebox.show_error(title=i18n.UI.enum_del_ins_err, message=i18n.UI.enum_del_ins_err_t)
             return
 
-        result = dialogs.Messagebox.okcancel(title="删除实例", message=f"确定删除实例 {item} 吗？\n这将删除实例的所有配置和数据")
+        result = dialogs.Messagebox.okcancel(title=i18n.UI.enum_del_ins, message=i18n.UI.enum_del_ins_t.format(item=item))
         if result != MessageCatalog.translate("OK"): return
         module.services.delete(item)
         self.treeview.delete(item)
@@ -141,7 +146,7 @@ class Enumerate (object):
                 self.treeview.insert("", "end", iid=name, text=name)
             if instance.alive:
                 interface.methods.treeview_tag_add(self.treeview, name, "running")
-                interface.methods.treeview_value_set(self.treeview, name, 0, "▶")
+                interface.methods.treeview_value_set(self.treeview, name, 0, i18n.UI.enum_c_running)
             else:
                 interface.methods.treeview_tag_remove(self.treeview, name, "running")
                 interface.methods.treeview_value_set(self.treeview, name, 0, "")

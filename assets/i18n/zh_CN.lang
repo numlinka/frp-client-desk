@@ -7,9 +7,46 @@ language = 简体中文（中国）
 
 
 #define superiors UI
-create = 创建
-rename = 重命名
-remove = 删除
+minutiae_null = 未选择实例
+common = 通用配置
+link = ➤
+open_in_browser = 在浏览器中打开
+options = 操作
+option_run = ▶ 启动
+option_stop = ■ 停止
+option_reload = 热加载
+option_save = 保存
+option_value_err = 参数错误
+option_common_err = 通用配置存在参数错误\n请检查被颜色标记的参数
+option_proxie_err = 隧道列表存在参数错误\n请检查被颜色标记的参数
+proxies = 隧道列表
+proxies_name = 名称
+proxies_type = 隧道类型
+proxies_local_ip = 本地
+proxies_local_port = 本地端口
+proxies_remote_port = 远程端口
+proxies_enable = 启用
+proxies_delete = 删除
+proxies_add = 添加隧道
+proxies_del_err = 不中嘞
+proxies_del_err_t = 不可删除隧道\n隧道列表不能为空
+proxies_c_enable = ▶
+proxies_c_disable = ■
+proxies_c_delete = ✖
+terminal = 终端
+enum_new_ins = "新建实例"
+enum_new_ins_t = "输入新的实例名称\n名称不能为空、不能重复、不能包含特殊字符"
+enum_new_ins_err = "创建实例失败"
+enum_new_ins_err_t_null = 非法的实例名称\n实例名称不能为空
+enum_new_ins_err_t_exist = 不可用实例名称\n该名称已经存在
+enum_new_ins_err_t_valid = 非法的实例名称\n实例名称不能包含特殊字符：{char}
+enum_del_ins = 删除实例
+enum_del_ins_t = 确定删除实例 {item} 吗？\n这将删除实例的所有配置和数据
+enum_del_ins_err = 删除实例失败
+enum_del_ins_err_t = 不可删除正在运行实例\n请先停止该实例
+enum_c_running = ▶
+enum_c_delete = ✖
+enum_c_create = ✚
 
 
 #define superiors description.frp

@@ -1,8 +1,7 @@
 # Licensed under the GNU General Public License v3.0, see <http://www.gnu.org/licenses/gpl-3.0.html>.
 # frp-client-desk Copyright (c) 2025 numlinka.
 
-# std
-import tkinter
+__all__ = ["Proxies"]
 
 # site
 import ttkbootstrap
@@ -22,7 +21,7 @@ class Proxies (object):
     def __init__(self, master: "interface._services._minutiae.Minutiae") -> None:
         self.master = master
         self.frame = ttkbootstrap.Frame(self.master.notebook)
-        self.master.notebook.add(self.frame, text=i18n.ctrl.translation("隧道列表"))
+        self.master.notebook.add(self.frame, text=i18n.UI.proxies)
         self.scrollframe = ScrollFrame(self.frame)
         self.build()
 
@@ -36,14 +35,14 @@ class Proxies (object):
         self.atomic = Atomic()
         self.atomic.get_count()
 
-        self.lable_name = ttkbootstrap.Label(self.scrollframe, text="名称")
-        self.lable_type = ttkbootstrap.Label(self.scrollframe, text="隧道类型")
-        self.lable_local_ip = ttkbootstrap.Label(self.scrollframe, text="本地 IP")
-        self.lable_local_port = ttkbootstrap.Label(self.scrollframe, text="本地端口")
-        self.lable_remote_port = ttkbootstrap.Label(self.scrollframe, text="远程端口")
-        self.lable_enable = ttkbootstrap.Label(self.scrollframe, text="启用")
-        self.lable_delete = ttkbootstrap.Label(self.scrollframe, text="删除")
-        self.button_add = ttkbootstrap.Button(self.scrollframe, text="添加隧道", bootstyle=(SUCCESS, OUTLINE), command=self.bin_add_proxy)
+        self.lable_name = ttkbootstrap.Label(self.scrollframe, text=i18n.UI.proxies_name)
+        self.lable_type = ttkbootstrap.Label(self.scrollframe, text=i18n.UI.proxies_type)
+        self.lable_local_ip = ttkbootstrap.Label(self.scrollframe, text=i18n.UI.proxies_local_ip)
+        self.lable_local_port = ttkbootstrap.Label(self.scrollframe, text=i18n.UI.proxies_local_port)
+        self.lable_remote_port = ttkbootstrap.Label(self.scrollframe, text=i18n.UI.proxies_remote_port)
+        self.lable_enable = ttkbootstrap.Label(self.scrollframe, text=i18n.UI.proxies_enable)
+        self.lable_delete = ttkbootstrap.Label(self.scrollframe, text=i18n.UI.proxies_delete)
+        self.button_add = ttkbootstrap.Button(self.scrollframe, text=i18n.UI.proxies_add, bootstyle=(SUCCESS, OUTLINE), command=self.bin_add_proxy)
 
         self.lable_name.grid(row=0, column=0, sticky=EW, padx=2, pady=2)
         self.lable_type.grid(row=0, column=1, sticky=EW, padx=2, pady=2)
@@ -65,7 +64,7 @@ class Proxies (object):
 
     def bin_delete_proxy(self, unit: "ConfigUnit") -> None:
         if len(self.list) == 1:
-            dialogs.Messagebox.show_error(title="不中嘞", message="不可删除隧道\n隧道列表不能为空")
+            dialogs.Messagebox.show_error(title=i18n.UI.proxies_del_err, message=i18n.UI.proxies_del_err_t)
             return
 
         self.list.remove(unit)
@@ -143,8 +142,8 @@ class ConfigUnit (object):
         self.entry_local_ip = ttkbootstrap.Entry(self.frame, textvariable=self.v_local_ip, width=16)
         self.entry_local_port = ttkbootstrap.Spinbox(self.frame, textvariable=self.v_local_port, from_=0, to=65535, width=8)
         self.entry_remote_port = ttkbootstrap.Spinbox(self.frame, textvariable=self.v_remote_port, from_=0, to=65535, width=8)
-        self.check_enable = ttkbootstrap.Checkbutton(self.frame, variable=self.v_enable, text="▶", bootstyle=(OUTLINE, TOOLBUTTON, SUCCESS))
-        self.button_delete = ttkbootstrap.Button(self.frame, text="✖", bootstyle=(DANGER, OUTLINE), command=self.bin_delete)
+        self.check_enable = ttkbootstrap.Checkbutton(self.frame, variable=self.v_enable, text=i18n.UI.proxies_c_enable, bootstyle=(OUTLINE, TOOLBUTTON, SUCCESS))
+        self.button_delete = ttkbootstrap.Button(self.frame, text=i18n.UI.proxies_c_delete, bootstyle=(DANGER, OUTLINE), command=self.bin_delete)
 
         self.entry_name.grid(row=self.serial, column=0, sticky=EW, padx=2, pady=2)
         self.entry_type.grid(row=self.serial, column=1, sticky=EW, padx=2, pady=2)
@@ -244,10 +243,10 @@ class ConfigUnit (object):
 
     def bin_enable_change(self, *_) -> None:
         if self.v_enable.get():
-            self.check_enable.configure(text="▶", bootstyle=(OUTLINE, TOOLBUTTON, SUCCESS))
+            self.check_enable.configure(text=i18n.UI.proxies_c_enable, bootstyle=(OUTLINE, TOOLBUTTON, SUCCESS))
 
         else:
-            self.check_enable.configure(text="■", bootstyle=(OUTLINE, TOOLBUTTON, WARNING))
+            self.check_enable.configure(text=i18n.UI.proxies_c_disable, bootstyle=(OUTLINE, TOOLBUTTON, WARNING))
 
     def bin_delete(self, *_) -> None:
         self.master.bin_delete_proxy(self)

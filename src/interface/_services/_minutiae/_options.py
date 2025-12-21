@@ -1,8 +1,7 @@
 # Licensed under the GNU General Public License v3.0, see <http://www.gnu.org/licenses/gpl-3.0.html>.
 # frp-client-desk Copyright (c) 2025 numlinka.
 
-# std
-import tkinter
+__all__ = ["Options"]
 
 # site
 import ttkbootstrap
@@ -15,23 +14,24 @@ from ttkbootstrap.constants import *
 import core
 import module
 import interface
-from constants.event import INSTANCE_SWITCHED
+
 from basic import i18n
+from constants.event import INSTANCE_SWITCHED
 
 
 class Options (object):
     def __init__(self, master: "interface._services._minutiae.Minutiae") -> None:
         self.master = master
         self.frame = self.master.frame_options
-        self.labelframe = ttkbootstrap.Labelframe(self.frame, text=i18n.options)
+        self.labelframe = ttkbootstrap.Labelframe(self.frame, text=i18n.UI.options)
         self.build()
 
     @once
     def build(self) -> None:
         self.labelframe.pack(fill=X)
-        self.button_switch = ttkbootstrap.Button(self.labelframe, text="■ 停止", bootstyle=(DANGER, OUTLINE), command=self.bin_switch, width=12)
-        self.button_reload = ttkbootstrap.Button(self.labelframe, text="reload", bootstyle=(INFO, OUTLINE), command=self.bin_reload, width=12)
-        self.button_save = ttkbootstrap.Button(self.labelframe, text="save", bootstyle=(INFO, OUTLINE), command=self.bin_save, width=12)
+        self.button_switch = ttkbootstrap.Button(self.labelframe, text=i18n.UI.option_stop, bootstyle=(DANGER, OUTLINE), command=self.bin_switch, width=12)
+        self.button_reload = ttkbootstrap.Button(self.labelframe, text=i18n.UI.option_reload, bootstyle=(INFO, OUTLINE), command=self.bin_reload, width=12)
+        self.button_save = ttkbootstrap.Button(self.labelframe, text=i18n.UI.option_save, bootstyle=(INFO, OUTLINE), command=self.bin_save, width=12)
         self.button_switch.pack(side=RIGHT, pady=4, padx=(4))
         self.button_reload.pack(side=RIGHT, pady=4, padx=(4, 0))
         self.button_save.pack(side=RIGHT, pady=4, padx=(4, 0))
@@ -65,11 +65,11 @@ class Options (object):
 
     def bin_save(self) -> None:
         if not self.master.common.validity:
-            dialogs.Messagebox.show_warning(title="参数错误", message="通用配置存在参数错误\n请检查被颜色标记的参数")
+            dialogs.Messagebox.show_warning(title=i18n.UI.option_value_err, message=i18n.UI.option_common_err)
             return
 
         if not self.master.proxies.validity:
-            dialogs.Messagebox.show_warning(title="参数错误", message="隧道列表存在参数错误\n请检查被颜色标记的参数")
+            dialogs.Messagebox.show_warning(title=i18n.UI.option_value_err, message=i18n.UI.option_proxie_err)
             return
 
         self.sbin_disabled()
@@ -89,6 +89,6 @@ class Options (object):
 
         instance = module.services.instance(name)
         if instance.alive:
-            self.button_switch.configure(text="■ 停止", bootstyle=(DANGER, OUTLINE))
+            self.button_switch.configure(text=i18n.UI.option_stop, bootstyle=(DANGER, OUTLINE))
         else:
-            self.button_switch.configure(text="▶ 启动", bootstyle=(SUCCESS, OUTLINE))
+            self.button_switch.configure(text=i18n.UI.option_run, bootstyle=(SUCCESS, OUTLINE))
