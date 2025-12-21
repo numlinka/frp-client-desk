@@ -11,6 +11,7 @@ from typex import once
 from ttkbootstrap.constants import *
 
 # local
+import module
 import interface
 from basic import i18n
 
@@ -53,5 +54,20 @@ class Minutiae (object):
 
     def update(self) -> None:
         name = self.master.enumerate.item_selected
-        self.show() if name and name != f"$ /add" else self.hide()
-        self.options.update()
+        # self.options.update()
+
+        if name is None or name == "$ /add":
+            self.hide()
+            return
+
+        self.show()
+        self.terminal.clear()
+        self.common.clear()
+
+        config = module.services.instance(name).load_config()
+        proxys = config.get("proxies", [])
+        if not isinstance(proxys, list): proxys = []
+
+        self.terminal.update()
+        self.common.update(config)
+        self.proxies.update(proxys)

@@ -2,7 +2,8 @@
 # frp-client-desk Copyright (c) 2025 numlinka.
 
 # std
-import tkinter
+import webbrowser
+from typing import Any
 
 # site
 import ttkbootstrap
@@ -11,6 +12,7 @@ from typex import once
 from ttkbootstrap.constants import *
 
 # local
+import module
 import interface
 
 from basic import i18n
@@ -54,9 +56,29 @@ class Common (object):
     def build(self) -> None:
         self.scrollframe.pack(side=TOP, fill=BOTH, expand=True, padx=2, pady=2)
 
-        self.options = []
+        self.options: dict[str, ConfigUnit] = {}
         for i, info in enumerate(CONFIG_LIST):
-            self.options.append(ConfigUnit(self.scrollframe, i, info))
+            self.options[info.name] = ConfigUnit(self.scrollframe, i, info)
+
+    def clear(self) -> None:
+        for _, value in self.options.items():
+            value.clear()
+
+    def update(self, config: dict) -> None:
+        # name = self.master.master.enumerate.item_selected
+        # if name is None or name == "$ /add": return
+
+        # config = module.services.instance(name).load_config()
+
+        for name, value in self.options.items():
+            if "." in name:
+                k1, k2 = name.split(".")
+                if k1 not in config: continue
+                if k2 not in config[k1]: continue
+                value.variable.set(config[k1][k2])
+
+            elif name in config:
+                value.variable.set(config[name])
 
 
 class ConfigUnit (object):
@@ -67,33 +89,44 @@ class ConfigUnit (object):
         self.build()
 
     def build(self) -> None:
-        if self.info.type_ == int:      self.variable = ttkbootstrap.IntVar()
-        elif self.info.type_ == bool:   self.variable = ttkbootstrap.BooleanVar()
-        elif self.info.type_ == float:  self.variable = ttkbootstrap.DoubleVar()
-        else:                           self.variable = ttkbootstrap.StringVar()
+        self.variable = ttkbootstrap.Variable()
 
         self.label = ttkbootstrap.Label(self.master, text=self.info.name)
 
+        width = 32
         match self.info.name:
             case "auth.method":
-                self.entry = ttkbootstrap.Combobox(self.master, values=["", "token", "oidc"], width=50, textvariable=self.variable, state=READONLY)
-                self.variable.set("token")
+                self.entry = ttkbootstrap.Combobox(self.master, values=["", "token", "oidc"], width=width, textvariable=self.variable, state=READONLY)
+                # self.variable.set("token")
 
             case "serverPort" | "webServer.port":
-                self.entry = ttkbootstrap.Spinbox(self.master, from_=0, to=65535, width=50, textvariable=self.variable)
+                self.entry = ttkbootstrap.Spinbox(self.master, from_=0, to=65535, width=width, textvariable=self.variable)
 
             case "udpPacketSize":
-                self.entry = ttkbootstrap.Spinbox(self.master, from_=0, to=65535, width=50, textvariable=self.variable)
-                self.variable.set(1500)
+                self.entry = ttkbootstrap.Spinbox(self.master, from_=0, to=65535, width=width, textvariable=self.variable)
+                # self.variable.set(1500)
 
             case _:
                 if self.info.type_ == bool:
                     self.entry = ttkbootstrap.Checkbutton(self.master, variable=self.variable, text="False / True", bootstyle=(SQUARE, TOGGLE))
 
                 else:
-                    self.entry = ttkbootstrap.Entry(self.master, width=50, textvariable=self.variable)
+                    self.entry = ttkbootstrap.Entry(self.master, width=width, textvariable=self.variable)
 
         self.label.grid(row=self.serial, column=0, sticky=W, padx=2, pady=2)
         self.entry.grid(row=self.serial, column=1, sticky=EW, padx=2, pady=2)
         interface.annotation.register(self.label, i18n.ctrl.translation(f"description.frp.{self.info.name}"))
         interface.annotation.register(self.entry, i18n.ctrl.translation(f"description.frp.{self.info.name}"))
+
+        if self.info.name == "webServer.port":
+            self.button = ttkbootstrap.Button(self.master, text="➤", bootstyle=(OUTLINE, INFO), command=self.open_browser)
+            self.button.grid(row=self.serial, column=2, sticky=E, padx=2, pady=2)
+            interface.annotation.register(self.button, i18n.ctrl.translation(f"在浏览器中打开"))
+
+    def clear(self) -> None:
+        self.variable.set("")
+
+    def open_browser(self) -> None:
+        port = self.variable.get()
+        if port == 0: return
+        webbrowser.open(f"http://localhost:{port}")

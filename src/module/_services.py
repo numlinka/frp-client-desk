@@ -4,6 +4,7 @@
 # std
 import os
 import time
+import tomllib
 import threading
 import subprocess
 from typing import NoReturn
@@ -47,6 +48,7 @@ class Instance (object):
         self.thread_stdout: threading.Thread | None = None
         self.thread_stderr: threading.Thread | None = None
         self.logs: list[str] = []
+        self.load_config()
 
     @property
     def name(self) -> str:
@@ -112,6 +114,17 @@ class Instance (object):
             if line: self.add_log(line)
 
         raise SystemExit(0)
+
+    def load_config(self) -> dict:
+        try:
+            with open(self.__config_file, "rb") as f:
+                return tomllib.load(f)
+
+        except Exception:
+            return {}
+
+    def save_config(self, config: dict) -> None:
+        ... # TODO
 
 
 def initialize_first() -> None:

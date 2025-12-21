@@ -61,12 +61,33 @@ class Proxies (object):
 
     def bin_delete_proxy(self, unit: "ConfigUnit") -> None:
         if len(self.list) == 1:
-            dialogs.Messagebox.show_error(title="不中嘞", message="不可删除该隧道\n隧道列表不能为空")
+            dialogs.Messagebox.show_error(title="不中嘞", message="不可删除隧道\n隧道列表不能为空")
             return
 
         self.list.remove(unit)
         unit.forget()
 
+    def clear(self) -> None:
+        self.atomic = Atomic()
+        self.atomic.get_count()
+        for unit in self.list:
+            unit.forget()
+        self.list.clear()
+
+    def update(self, proxys: list[dict]) -> None:
+        for unit in self.list:
+            unit.forget()
+        self.list.clear()
+
+        for proxy in proxys:
+            unit = ConfigUnit(self, self.atomic.count)
+            self.list.append(unit)
+            if "name" in proxy: unit.v_name.set(proxy["name"])
+            if "type" in proxy: unit.v_type.set(proxy["type"])
+            if "local_ip" in proxy: unit.v_local_ip.set(proxy["local_ip"])
+            if "local_port" in proxy: unit.v_local_port.set(proxy["local_port"])
+            if "remote_port" in proxy: unit.v_remote_port.set(proxy["remote_port"])
+            if "enable" in proxy: unit.v_enable.set(proxy["enable"])
 
 
 class ConfigUnit (object):

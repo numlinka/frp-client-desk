@@ -11,6 +11,7 @@ from typex import once
 from ttkbootstrap.constants import *
 
 # local
+import module
 import interface
 from basic import i18n
 
@@ -52,3 +53,11 @@ class Terminal (object):
 
     def __exit__(self, *_) -> None:
         self.textbox.configure(state=DISABLED)
+
+    def update(self) -> None:
+        name = self.master.master.enumerate.item_selected
+        if name is None or name == "$ /add": return
+
+        self.clear()
+        for log in module.services.instance(name).logs:
+            self.println(log)
