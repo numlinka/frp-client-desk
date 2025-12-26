@@ -57,4 +57,7 @@ def initialize_setup() -> None:
 @once
 def initialize_final() -> None:
     mainwindow.after(100, lambda *_: core.event.emit(constants.event.MAINLOOP))
+    mainwindow.protocol("WM_DELETE_WINDOW", lambda *_: mainwindow.withdraw())
+    core.actions.exit.add_task(lambda *_: mainwindow.destroy(), priority=1000)
+
     utils.exec_initialize_activitys(_activitys, 2)

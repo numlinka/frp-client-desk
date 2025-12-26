@@ -11,17 +11,18 @@ import ezudesign
 from typex import once
 
 # local
+import tray
 import utils
 import module
 import constants
 import interface
 from basic import cwd, i18n
 
-_activitys = [module, interface]
 # internal
 from . import actions
 
 
+_activitys = [module, interface, tray]
 
 event: ezudesign.eventhub.EventHub
 

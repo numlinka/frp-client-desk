@@ -65,6 +65,12 @@ class _LocalI18n (Internationalization):
         enum_c_delete: I18nString
         enum_c_create: I18nString
 
+    class tray (object):
+        name: I18nString
+        deiconify: I18nString
+        stop_all_instances: I18nString
+        exit: I18nString
+
 
 abscwd = _CWD()
 _CWD._include_ = False

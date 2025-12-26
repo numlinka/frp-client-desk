@@ -53,6 +53,13 @@ enum_c_delete = ✖
 enum_c_create = ✚
 
 
+#define superiors tray
+name = frp-client-desk
+deiconify = 显示窗口
+stop_all_instances = 停止所有实例
+exit = 关闭程序
+
+
 #define superiors description.frp
 user = 用户名，设置此参数后，代理名称会被修改为 {user}.{proxyName}，避免代理名称和其他用户冲突。
 serverAddr = 连接服务端的地址。
