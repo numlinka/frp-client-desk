@@ -3,7 +3,7 @@
 
 __all__ = []
 
-version_info = (0, 2, 1)
+version_info = (0, 3, 0)
 version = ".".join(map(str, version_info))
 
 name = "frp-client-desk"
