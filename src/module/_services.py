@@ -12,6 +12,9 @@ import threading
 import subprocess
 from typing import NoReturn
 
+# site
+from typex import Singleton, once
+
 # local
 import core
 import module
@@ -20,7 +23,7 @@ from basic import cwd
 from constants.event import INSTANCE_SWITCHED, INSTANCE_LOG_UPDATED
 
 
-class Services (object):
+class Services (Singleton):
     def __init__(self) -> None:
         self._lock = threading.RLock()
         self._instances: dict[str, Instance] = {}
@@ -166,9 +169,16 @@ class Instance (object):
             toml.dump(config, f)
 
 
+def stop_all_instances() -> None:
+    for name in module.services.instances_names():
+        module.services.instance(name).stop()
+
+@once
 def initialize_first() -> None:
     module.services = Services()
 
 
+@once
 def initialize_final() -> None:
     module.services.load()
+    core.actions.exit.add_task(stop_all_instances, priority=800)
